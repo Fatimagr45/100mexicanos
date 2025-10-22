@@ -7,6 +7,10 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="firebase-config.js"></script>
+<style>
+  body { text-align: center; font-family: Arial; background: #ff5722; color: white; }
+  button { padding: 15px 30px; margin: 10px; font-size: 1.2em; cursor: pointer; border-radius: 8px; border: none; background: #009688; color: white; }
+</style>
 </head>
 <body>
 <h1>Panel del Anfitrión</h1>
@@ -28,7 +32,7 @@ startBtn.addEventListener("click", () => {
   const interval = setInterval(() => {
     contador--;
     juegoRef.update({contador: contador});
-    if(contador === 0){
+    if(contador <= 0){
       clearInterval(interval);
       juegoRef.update({estado: "activo"});
     }

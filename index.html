@@ -26,35 +26,40 @@ const playerName = prompt("Escribe tu nombre:");
 const juegoRef = db.ref("juego");
 
 // Escuchar cambios en Firebase
-juegoRef.on("value", (snapshot) => {
+juegoRef.on("value", snapshot => {
   const data = snapshot.val();
-  
-  if(data && data.inicio) {
-    let tiempo = data.tiempo; // duración de la ronda en segundos
-    buzzBtn.disabled = false;
+  if(!data) return;
 
-    // Mostrar cuenta regresiva
-    const interval = setInterval(() => {
-      if(tiempo > 0){
-        statusEl.textContent = `¡Ronda iniciada! ${tiempo}s restantes`;
-        tiempo--;
-      } else {
-        clearInterval(interval);
-        statusEl.textContent = "Tiempo terminado";
-        buzzBtn.disabled = true;
-      }
-    }, 1000);
+  // Mostrar cuenta regresiva
+  if(data.estado === "cuenta") {
+    buzzBtn.disabled = true;
+    statusEl.textContent = `¡Comenzando en ${data.contador}s!`;
+  }
+
+  // Ronda activa, botón habilitado
+  if(data.estado === "activo") {
+    buzzBtn.disabled = false;
+    statusEl.textContent = "¡Ronda iniciada! Presiona el botón";
+  }
+
+  // Esperando inicio
+  if(data.estado === "esperando") {
+    buzzBtn.disabled = true;
+    statusEl.textContent = "Esperando inicio...";
+  }
+
+  // Mostrar ganador
+  if(data.ganador) {
+    buzzBtn.disabled = true;
+    statusEl.textContent = `¡Ganador: ${data.ganador}!`;
   }
 });
 
 // Registrar quién presiona primero
 buzzBtn.addEventListener("click", () => {
-  juegoRef.child("primerJugador").once("value", snapshot => {
+  juegoRef.child("ganador").once("value", snapshot => {
     if(!snapshot.exists()) {
-      juegoRef.update({ primerJugador: playerName });
-      statusEl.textContent = `¡Ganador: ${playerName}!`;
-    } else {
-      statusEl.textContent = `¡Ya presionó ${snapshot.val()}!`;
+      juegoRef.update({ ganador: playerName });
     }
   });
 });
