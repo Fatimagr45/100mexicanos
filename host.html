@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Host - 100 Mexicanos Dijeron</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="firebase-config.js"></script>
+</head>
+<body>
+<h1>Panel del Anfitrión</h1>
+<button id="startBtn">Iniciar Ronda</button>
+<button id="resetBtn">Reiniciar Juego</button>
+<p id="estado">Esperando...</p>
+
+<script>
+const startBtn = document.getElementById("startBtn");
+const resetBtn = document.getElementById("resetBtn");
+const estadoEl = document.getElementById("estado");
+const juegoRef = db.ref("juego");
+
+// Iniciar ronda con cuenta regresiva
+startBtn.addEventListener("click", () => {
+  let contador = 3;
+  juegoRef.set({estado: "cuenta", contador: contador, ganador: null});
+  
+  const interval = setInterval(() => {
+    contador--;
+    juegoRef.update({contador: contador});
+    if(contador === 0){
+      clearInterval(interval);
+      juegoRef.update({estado: "activo"});
+    }
+  }, 1000);
+});
+
+// Reiniciar juego
+resetBtn.addEventListener("click", () => {
+  juegoRef.set({estado: "esperando", contador: 0, ganador: null});
+});
+
+// Mostrar estado en tiempo real
+juegoRef.on("value", snapshot => {
+  const data = snapshot.val();
+  if(!data) return;
+  estadoEl.textContent = `Estado: ${data.estado}` + (data.ganador ? ` | Ganador: ${data.ganador}` : "");
+});
+</script>
+</body>
+</html>
