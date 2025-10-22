@@ -24,57 +24,6 @@ const statusEl = document.getElementById("status");
 const playerName = prompt("Escribe tu nombre:");
 
 const juegoRef = db.ref("juego");
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jugador - 100 Mexicanos Dijeron</title>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="firebase-config.js"></script>
-</head>
-<body>
-<h1>🔥 100 Mexicanos Dijeron 🔥</h1>
-<p id="status">Esperando inicio...</p>
-<button id="buzzBtn" disabled>¡Presiona!</button>
-
-<script>
-const buzzBtn = document.getElementById("buzzBtn");
-const statusEl = document.getElementById("status");
-const playerName = prompt("Escribe tu nombre:");
-
-const juegoRef = db.ref("juego");
-
-// Escucha cambios en tiempo real
-juegoRef.on("value", snapshot => {
-  const data = snapshot.val();
-  if (!data) return;
-
-  if(data.estado === "esperando") {
-    statusEl.textContent = "Esperando inicio...";
-    buzzBtn.disabled = true;
-  } else if(data.estado === "cuenta") {
-    statusEl.textContent = `Cuenta regresiva: ${data.contador}`;
-    buzzBtn.disabled = true;
-  } else if(data.estado === "activo") {
-    statusEl.textContent = "¡Presiona ahora!";
-    buzzBtn.disabled = false;
-  } else if(data.estado === "finalizado") {
-    statusEl.textContent = data.ganador ? `🏆 ${data.ganador} presionó primero` : "Ronda terminada";
-    buzzBtn.disabled = true;
-  }
-});
-
-// Detectar quién presiona primero
-buzzBtn.addEventListener("click", () => {
-  juegoRef.child("ganador").once("value").then(snapshot => {
-    if(!snapshot.val()){
-      juegoRef.update({ganador: playerName, estado: "finalizado"});
-    }
-  });
-});
 </script>
 </body>
 </html>
